@@ -73,8 +73,12 @@ class Campaign:
     sending_days: List[int]       # 1=Mon, 2=Tue, ..., 7=Sun
     sending_start_hour: int       # 0-23
     sending_end_hour: int         # 0-23
+    sending_start_minute: int     # 0-59
+    sending_end_minute: int       # 0-59
     daily_limit: int              # max emails per day
     sent_today: int
+    queued_today: int             # emails queued but not yet sent today
+    context: Optional[str]        # campaign context/notes
     total_leads: int
     total_sent: int
     total_delivered: int
@@ -113,11 +117,16 @@ Same fields as CampaignCreate but all optional including `name`.
 class Sequence:
     id: str
     campaign_id: str
+    name: Optional[str]           # step name/label
     step_number: int              # order in the sequence chain
     subject: Optional[str]        # email subject (supports {{variables}})
     body: str                     # email body (supports {{variables}} and spintax)
     delay_days: int               # days to wait after previous step
-    template_type: str            # "email"
+    delay_hours: int              # additional hours to wait after delay_days
+    send_only_if_no_reply: bool   # skip step if lead already replied
+    send_as_html: bool            # send as HTML (vs plain text)
+    variants: Optional[List]      # A/B test variants
+    has_variants: bool            # whether step has A/B variants
     created_at: Optional[str]
     updated_at: Optional[str]
 ```
@@ -129,9 +138,12 @@ class Sequence:
 class SequenceCreate:
     body: str                                  # required
     subject: Optional[str] = None
+    name: Optional[str] = None
     delay_days: int = 1
+    delay_hours: int = 0
     step_number: Optional[int] = None          # auto-assigned if omitted
-    template_type: str = "email"
+    send_only_if_no_reply: bool = True
+    send_as_html: bool = False
 ```
 
 ### SequenceUpdate
@@ -141,8 +153,12 @@ class SequenceCreate:
 class SequenceUpdate:
     subject: Optional[str] = None
     body: Optional[str] = None
+    name: Optional[str] = None
     delay_days: Optional[int] = None
+    delay_hours: Optional[int] = None
     step_number: Optional[int] = None
+    send_only_if_no_reply: Optional[bool] = None
+    send_as_html: Optional[bool] = None
 ```
 
 ---
@@ -156,7 +172,7 @@ class Template:
     name: str
     subject: Optional[str]
     body: str
-    template_type: str            # "email"
+    category: str                 # "email" | "snippet" | etc.
     send_as_html: bool
     created_at: Optional[str]
     updated_at: Optional[str]
@@ -170,7 +186,7 @@ class TemplateCreate:
     name: str                     # required
     body: str                     # required
     subject: Optional[str] = None
-    template_type: str = "email"
+    category: str = "email"       # "email" | "snippet" | etc.
     send_as_html: bool = False
 ```
 
@@ -277,6 +293,43 @@ class DailyStat:
 
 ---
 
+### Webhook
+
+```python
+@dataclass(frozen=True)
+class Webhook:
+    id: str
+    url: str
+    is_active: bool
+    events: List[str]                     # list of subscribed event types
+    last_delivered_at: Optional[str]      # ISO 8601
+    consecutive_failures: int
+    created_at: Optional[str]
+    updated_at: Optional[str]
+```
+
+### WebhookCreate
+
+```python
+@dataclass
+class WebhookCreate:
+    url: str                              # required — endpoint URL
+    events: List[str]                     # required — event types to subscribe to
+    is_active: bool = True
+```
+
+### WebhookUpdate
+
+```python
+@dataclass
+class WebhookUpdate:
+    url: Optional[str] = None
+    events: Optional[List[str]] = None
+    is_active: Optional[bool] = None
+```
+
+---
+
 ### WebhookEvent
 
 ```python
@@ -318,6 +371,12 @@ class WebhookEvent:
 | PATCH | `/leads/{id}` | Update lead |
 | DELETE | `/leads/{id}` | Soft-delete lead |
 
+#### Lead Activity
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/leads/{id}/activity` | Get lead activity. Returns `{ activities: [...], campaigns: [...] }` |
+
 ### Campaigns — `/campaigns`
 
 | Method | Path | Description |
@@ -329,12 +388,15 @@ class WebhookEvent:
 | DELETE | `/campaigns/{id}` | Delete (must be draft) |
 | POST | `/campaigns/{id}/start` | Start campaign |
 | POST | `/campaigns/{id}/pause` | Pause campaign |
+| POST | `/campaigns/{id}/resume` | Resume paused campaign |
 | GET | `/campaigns/{id}/sequences` | List sequence steps |
 | POST | `/campaigns/{id}/sequences` | Add sequence step |
 | PATCH | `/campaigns/{id}/sequences/{seq_id}` | Update step |
 | DELETE | `/campaigns/{id}/sequences/{seq_id}` | Delete step |
 | POST | `/campaigns/{id}/leads` | Add leads. Body: `{ leadIds: [...] }` |
+| DELETE | `/campaigns/{id}/leads/{lead_id}` | Remove lead from campaign |
 | POST | `/campaigns/{id}/accounts` | Assign accounts. Body: `{ accountIds: [...] }` |
+| DELETE | `/campaigns/{id}/accounts/{account_id}` | Remove account from campaign |
 
 ### Templates — `/templates`
 
@@ -361,6 +423,9 @@ class WebhookEvent:
 | GET | `/inbox/threads` | List threads. Query: `page`, `pageSize`, `category`, `isRead`, `isStarred`, `accountId`, `campaignId`, `search` |
 | GET | `/inbox/{id}` | Get thread |
 | PATCH | `/inbox/{id}` | Update thread (category, read, starred) |
+| GET | `/inbox/threads/{id}/conversation` | Full conversation thread with all messages |
+| POST | `/inbox/threads/{id}/reply` | Send reply. Body: `{ body: str, subject?: str }` |
+| GET | `/inbox/stats` | Inbox statistics (counts by category, unread totals) |
 
 ### Analytics — `/analytics`
 
@@ -373,4 +438,9 @@ class WebhookEvent:
 
 | Method | Path | Description |
 |--------|------|-------------|
+| GET | `/webhooks/events` | List available event types |
+| GET | `/webhooks` | List webhooks. Query: `page`, `pageSize` |
+| POST | `/webhooks` | Create webhook. Returns secret on creation |
+| PATCH | `/webhooks/{id}` | Update webhook |
+| DELETE | `/webhooks/{id}` | Delete webhook |
 | POST | `/webhooks/inbound` | Incoming webhook receiver |

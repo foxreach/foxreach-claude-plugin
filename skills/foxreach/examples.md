@@ -470,6 +470,258 @@ client.close()
 
 ---
 
+## Webhooks
+
+### List available event types
+
+```python
+from foxreach import FoxReach
+
+client = FoxReach(api_key="otr_YOUR_KEY")
+
+events = client.webhooks.list_events()
+for event in events:
+    print(f"  {event}")
+
+client.close()
+```
+
+### Create a webhook
+
+```python
+from foxreach import FoxReach, WebhookCreate
+
+client = FoxReach(api_key="otr_YOUR_KEY")
+
+webhook = client.webhooks.create(WebhookCreate(
+    url="https://example.com/webhook",
+    events=["reply.received", "email.bounced"],
+))
+
+print(f"Webhook created: {webhook.id}")
+print(f"Secret: {webhook.secret}")  # Save this! Only shown on creation.
+
+client.close()
+```
+
+### List webhooks
+
+```python
+from foxreach import FoxReach
+
+client = FoxReach(api_key="otr_YOUR_KEY")
+
+page = client.webhooks.list()
+for wh in page:
+    active = "active" if wh.is_active else "inactive"
+    events = ", ".join(wh.events)
+    print(f"  {wh.id}  {wh.url:40s}  {active:10s}  events: {events}")
+
+client.close()
+```
+
+### Update a webhook
+
+```python
+from foxreach import FoxReach, WebhookUpdate
+
+client = FoxReach(api_key="otr_YOUR_KEY")
+
+webhook = client.webhooks.update("whk_abc123", WebhookUpdate(
+    is_active=True,
+    events=["reply.received", "email.bounced", "campaign.completed"],
+))
+
+print(f"Updated webhook: {webhook.id} — events: {', '.join(webhook.events)}")
+client.close()
+```
+
+### Delete a webhook
+
+```python
+from foxreach import FoxReach
+
+client = FoxReach(api_key="otr_YOUR_KEY")
+client.webhooks.delete("whk_abc123")
+print("Webhook deleted")
+client.close()
+```
+
+---
+
+## Lead Activity
+
+### Get activity for a lead
+
+```python
+from foxreach import FoxReach
+
+client = FoxReach(api_key="otr_YOUR_KEY")
+
+result = client.leads.activity("cld_abc123def456")
+
+print("=== Activities ===")
+for activity in result.activities:
+    print(f"  {activity.get('type', 'unknown'):20s}  {activity.get('timestamp', '')}")
+
+print("\n=== Campaigns ===")
+for campaign in result.campaigns:
+    print(f"  {campaign.get('id', '')}  {campaign.get('name', '')}")
+
+client.close()
+```
+
+---
+
+## Inbox — Conversation, Reply & Stats
+
+### Get full conversation thread
+
+```python
+from foxreach import FoxReach
+
+client = FoxReach(api_key="otr_YOUR_KEY")
+
+conversation = client.inbox.get_conversation("rpl_abc123")
+for msg in conversation.messages:
+    direction = ">>>" if msg.get("is_outbound") else "<<<"
+    print(f"{direction} {msg.get('from_email', '')} — {msg.get('sent_at', '')}")
+    print(f"    {msg.get('body_plain', '')[:100]}")
+    print()
+
+client.close()
+```
+
+### Send a reply
+
+```python
+from foxreach import FoxReach
+
+client = FoxReach(api_key="otr_YOUR_KEY")
+
+reply = client.inbox.send_reply("rpl_abc123", body="Thanks for your interest! Let's schedule a call.")
+print(f"Reply sent: {reply.id}")
+
+client.close()
+```
+
+### Get inbox stats
+
+```python
+from foxreach import FoxReach
+
+client = FoxReach(api_key="otr_YOUR_KEY")
+
+stats = client.inbox.stats()
+print("=== Inbox Stats ===")
+print(f"Total unread: {stats.get('unread', 0)}")
+print(f"Interested:   {stats.get('interested', 0)}")
+print(f"Not interested: {stats.get('not_interested', 0)}")
+print(f"Out of office:  {stats.get('out_of_office', 0)}")
+
+client.close()
+```
+
+---
+
+## Campaign — Resume, Remove Lead, Remove Account
+
+### Resume a paused campaign
+
+```python
+from foxreach import FoxReach
+
+client = FoxReach(api_key="otr_YOUR_KEY")
+
+campaign = client.campaigns.resume("cmp_xyz789")
+print(f"Resumed: {campaign.name} — status: {campaign.status}")
+
+client.close()
+```
+
+### Remove a lead from a campaign
+
+```python
+from foxreach import FoxReach
+
+client = FoxReach(api_key="otr_YOUR_KEY")
+
+client.campaigns.remove_lead("cmp_xyz789", "cld_abc123")
+print("Lead removed from campaign")
+
+client.close()
+```
+
+### Remove an account from a campaign
+
+```python
+from foxreach import FoxReach
+
+client = FoxReach(api_key="otr_YOUR_KEY")
+
+client.campaigns.remove_account("cmp_xyz789", "acc_sender1")
+print("Account removed from campaign")
+
+client.close()
+```
+
+---
+
+## CLI Examples
+
+### Webhooks via CLI
+
+```bash
+# List event types
+foxreach webhooks events
+
+# List all webhooks
+foxreach webhooks list --json
+
+# Create a webhook
+foxreach webhooks create --url "https://example.com/hook" --events "reply.received,email.bounced"
+
+# Update a webhook
+foxreach webhooks update WEBHOOK_ID --active
+
+# Delete a webhook
+foxreach webhooks delete WEBHOOK_ID
+```
+
+### Lead Activity via CLI
+
+```bash
+foxreach leads activity LEAD_ID --json
+```
+
+### Inbox via CLI
+
+```bash
+# Get full conversation
+foxreach inbox conversation REPLY_ID --json
+
+# Send a reply
+foxreach inbox reply REPLY_ID --body "Thanks for your interest!"
+
+# Get inbox stats
+foxreach inbox stats --json
+```
+
+### Campaign management via CLI
+
+```bash
+# Resume a paused campaign
+foxreach campaigns resume CAMPAIGN_ID
+
+# Remove a lead from a campaign
+foxreach campaigns remove-lead CAMPAIGN_ID LEAD_ID
+
+# Remove an account from a campaign
+foxreach campaigns remove-account CAMPAIGN_ID ACCOUNT_ID
+```
+
+---
+
 ## Async Usage
 
 All operations are available asynchronously:

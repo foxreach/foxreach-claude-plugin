@@ -80,6 +80,7 @@ For usage examples of every operation, see [examples.md](examples.md).
 | Create | `client.leads.create(LeadCreate(email=..., first_name=..., ...))` | Deduplicates by email |
 | Update | `client.leads.update(lead_id, LeadUpdate(company=..., ...))` | Partial update |
 | Delete | `client.leads.delete(lead_id)` | Soft-delete |
+| Activity | `client.leads.activity(lead_id)` | Returns activities + campaigns |
 
 ### Campaigns
 | Action | Method | Notes |
@@ -91,8 +92,11 @@ For usage examples of every operation, see [examples.md](examples.md).
 | Delete | `client.campaigns.delete(campaign_id)` | Must be draft |
 | Start | `client.campaigns.start(campaign_id)` | Transitions to active |
 | Pause | `client.campaigns.pause(campaign_id)` | Pauses sending |
+| Resume | `client.campaigns.resume(campaign_id)` | Resume paused campaign |
 | Add Leads | `client.campaigns.add_leads(campaign_id, [lead_ids])` | Bulk add |
 | Add Accounts | `client.campaigns.add_accounts(campaign_id, [account_ids])` | Assign senders |
+| Remove Lead | `client.campaigns.remove_lead(campaign_id, lead_id)` | Remove lead from campaign |
+| Remove Account | `client.campaigns.remove_account(campaign_id, account_id)` | Remove account from campaign |
 
 ### Sequences (nested under campaigns)
 | Action | Method | Notes |
@@ -124,6 +128,18 @@ For usage examples of every operation, see [examples.md](examples.md).
 | List Threads | `client.inbox.list_threads(category=..., is_read=..., ...)` | Filterable |
 | Get | `client.inbox.get(reply_id)` | Full thread |
 | Update | `client.inbox.update(reply_id, ThreadUpdate(is_read=..., ...))` | Mark read/starred |
+| Conversation | `client.inbox.get_conversation(reply_id)` | Full conversation thread |
+| Reply | `client.inbox.send_reply(reply_id, body=..., subject=...)` | Send reply |
+| Stats | `client.inbox.stats()` | Inbox statistics |
+
+### Webhooks
+| Action | Method | Notes |
+|--------|--------|-------|
+| List Events | `client.webhooks.list_events()` | Available event types |
+| List | `client.webhooks.list()` | Paginated |
+| Create | `client.webhooks.create(WebhookCreate(url=..., events=[...]))` | Returns secret on creation |
+| Update | `client.webhooks.update(webhook_id, WebhookUpdate(...))` | Partial update |
+| Delete | `client.webhooks.delete(webhook_id)` | Remove webhook |
 
 ### Analytics
 | Action | Method | Notes |

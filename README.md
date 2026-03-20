@@ -6,13 +6,14 @@ Official [Claude Code](https://claude.com/claude-code) plugin for managing [FoxR
 
 This plugin gives Claude Code the ability to manage your FoxReach account:
 
-- **Leads** — list, create, update, delete, bulk import
-- **Campaigns** — create, configure, start, pause, add leads/accounts
+- **Leads** — list, create, update, delete, bulk import, activity history
+- **Campaigns** — create, configure, start, pause, resume, add/remove leads/accounts
 - **Sequences** — add multi-step email sequences to campaigns
 - **Templates** — manage reusable email templates
 - **Email Accounts** — view accounts and health scores
-- **Inbox** — read and categorize reply threads
+- **Inbox** — read and categorize reply threads, view conversations, send replies, stats
 - **Analytics** — dashboard overview and campaign performance
+- **Webhooks** — list events, create, update, delete webhook subscriptions
 
 Claude uses the [FoxReach Python SDK](https://github.com/foxreach/foxreach-python-sdk) under the hood, executing operations through inline Python scripts.
 
