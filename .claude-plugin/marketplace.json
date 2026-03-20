@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "foxreach",
-      "source": ".",
+      "source": "./",
       "description": "Manage FoxReach cold email outreach — leads, campaigns, sequences, templates, email accounts, inbox, and analytics via the FoxReach Python SDK.",
       "version": "1.0.0",
       "author": {
