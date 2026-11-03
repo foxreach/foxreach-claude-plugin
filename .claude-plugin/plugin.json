@@ -1,7 +1,7 @@
 {
   "name": "foxreach",
   "displayName": "FoxReach",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Run FoxReach cold email outreach from Claude: campaign results, inbox replies, leads, sequences, templates and sending accounts, through the FoxReach connector.",
   "author": {
     "name": "FoxReach",
@@ -9,6 +9,7 @@
     "url": "https://www.foxreach.io"
   },
   "homepage": "https://www.foxreach.io",
+  "privacyPolicyUrl": "https://www.foxreach.io/privacy",
   "repository": "https://github.com/foxreach/foxreach-claude-plugin",
   "license": "MIT",
   "keywords": [
