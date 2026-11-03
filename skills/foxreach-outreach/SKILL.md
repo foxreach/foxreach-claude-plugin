@@ -26,6 +26,8 @@ The user's explicit instructions take priority over the suggested workflows in t
 
 **"Add these leads."** Use `create_lead` for each contact the user gives you (email is required). To put them into a campaign, find the campaign with `list_campaigns` and call `assign_leads_to_campaign`.
 
+**"Import this CSV."** Read the header row of the attached file, propose which columns map to email, first name, last name, company, title, phone, LinkedIn and website, and confirm the mapping with the user. Then call `import_csv_leads` with the mapping and the file contents as `csv_text` (up to 2 MB; split bigger files). Other columns become custom fields named after their header. Report how many leads were imported and how many were skipped as duplicates.
+
 **"Set up a campaign."** Create it with `create_campaign`, add steps with `create_sequence`, attach sending accounts with `assign_accounts_to_campaign`, add leads, then summarize the setup and ask before calling `start_campaign`.
 
 **"Are my inboxes OK?"** Call `list_email_accounts`, then `get_email_account_health` on any account that looks off. Explain problems in plain words (authentication records, bounce rate, warmup progress).
