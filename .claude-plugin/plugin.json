@@ -1,22 +1,23 @@
 {
   "name": "foxreach",
-  "description": "Manage FoxReach cold email outreach — leads, campaigns, sequences, templates, email accounts, inbox, and analytics via the FoxReach Python SDK.",
-  "version": "1.0.0",
+  "displayName": "FoxReach",
+  "version": "2.0.0",
+  "description": "Run FoxReach cold email outreach from Claude: campaign results, inbox replies, leads, sequences, templates and sending accounts, through the FoxReach connector.",
   "author": {
     "name": "FoxReach",
-    "email": "dev@foxreach.io"
+    "email": "support@foxreach.io",
+    "url": "https://www.foxreach.io"
   },
-  "homepage": "https://foxreach.io",
+  "homepage": "https://www.foxreach.io",
   "repository": "https://github.com/foxreach/foxreach-claude-plugin",
   "license": "MIT",
   "keywords": [
     "foxreach",
     "cold-email",
     "outreach",
+    "sales",
     "leads",
     "campaigns",
-    "email",
-    "sdk",
-    "api"
+    "inbox"
   ]
 }

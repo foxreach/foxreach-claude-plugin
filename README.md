@@ -1,91 +1,35 @@
-# FoxReach Claude Code Plugin
+# FoxReach plugin for Claude
 
-Official [Claude Code](https://claude.com/claude-code) plugin for managing [FoxReach](https://foxreach.io) cold email outreach directly from your terminal.
+Run your FoxReach cold email outreach from Claude. Ask how your campaigns are performing, read and answer replies, add leads, set up sequences and templates, check the health of your sending accounts, and pause or resume campaigns, all in plain language.
 
-## What it does
+FoxReach is a cold email outreach platform for sales teams, founders and agencies. You need a FoxReach account to use this plugin: [www.foxreach.io](https://www.foxreach.io).
 
-This plugin gives Claude Code the ability to manage your FoxReach account:
+## What's in the plugin
 
-- **Leads** — list, create, update, delete, bulk import, activity history
-- **Campaigns** — create, configure, start, pause, resume, add/remove leads/accounts
-- **Sequences** — add multi-step email sequences to campaigns
-- **Templates** — manage reusable email templates
-- **Email Accounts** — view accounts and health scores
-- **Inbox** — read and categorize reply threads, view conversations, send replies, stats
-- **Analytics** — dashboard overview and campaign performance
-- **Webhooks** — list events, create, update, delete webhook subscriptions
+- **FoxReach connector**: the remote MCP server at `https://api.foxreach.io/mcp`. The first time a FoxReach tool runs, Claude asks you to sign in with your FoxReach account (OAuth). The connector only works with the leads, campaigns, accounts and inbox in your own FoxReach workspace.
+- **FoxReach outreach skill**: guidance for Claude on common jobs (campaign results, reply triage, adding leads, campaign setup, inbox health) and ground rules: confirm before any change, never send a reply you have not seen, and state the credit cost before spending paid credits.
 
-Claude uses the [FoxReach Python SDK](https://github.com/foxreach/foxreach-python-sdk) under the hood, executing operations through inline Python scripts.
+## What it sends and where
 
-## Installation
+The plugin runs no local code, hooks or scripts. Claude talks only to `https://api.foxreach.io/mcp`, operated by FoxReach. Requests carry the tool arguments Claude chooses (for example a campaign id or the text of a reply you approved) and your FoxReach sign-in token. Results come back from your FoxReach workspace. Tools that send email, start or resume a campaign, overwrite records or spend paid credits are marked destructive, so Claude asks before running them.
 
-### From the marketplace
+How FoxReach handles your data: [Privacy Policy](https://www.foxreach.io/privacy). Terms: [Terms of Service](https://www.foxreach.io/terms).
+
+## Install
+
+In Claude Code:
 
 ```
 /plugin marketplace add foxreach/foxreach-claude-plugin
 /plugin install foxreach@foxreach-marketplace
 ```
 
-### Local install (for development)
+In Claude (claude.ai, Desktop, Cowork), install FoxReach from the plugin directory once it is listed, then sign in on the plugin's Connectors tab.
 
-```bash
-git clone https://github.com/foxreach/foxreach-claude-plugin.git
-claude --plugin-dir ./foxreach-claude-plugin
-```
+## Support
 
-## Prerequisites
-
-Install the FoxReach Python SDK before using:
-
-```bash
-pip install foxreach
-```
-
-Get your API key from the [FoxReach dashboard](https://foxreach.io) under Settings > API Keys.
-
-## Usage
-
-### Auto-invoked
-
-Just ask Claude anything about FoxReach, and it will use the plugin automatically:
-
-```
-List my active campaigns
-Create a lead for jane@example.com at Acme Corp
-Show me campaign analytics for cmp_xyz789
-Check my inbox for unread replies
-```
-
-### Manual invoke
-
-```
-/foxreach:foxreach list leads --search "acme"
-/foxreach:foxreach create campaign "Q1 Outreach"
-/foxreach:foxreach analytics overview
-```
-
-### JSON output
-
-Claude formats results as readable tables by default. Ask for JSON when you need raw data:
-
-```
-List my leads as JSON
-```
-
-## Skill contents
-
-| File | Description |
-|------|-------------|
-| `skills/foxreach/SKILL.md` | Main skill — quick reference, workflows, pagination, error handling |
-| `skills/foxreach/api-reference.md` | Complete data types, all endpoints, field definitions |
-| `skills/foxreach/examples.md` | Working code examples for every operation |
-
-## Related
-
-- [FoxReach Python SDK](https://github.com/foxreach/foxreach-python-sdk) — `pip install foxreach`
-- [FoxReach TypeScript SDK](https://github.com/foxreach/foxreach-typescript-sdk) — `npm install foxreach`
-- [FoxReach CLI](https://github.com/foxreach/foxreach-cli) — `pip install foxreach-cli`
+Email support@foxreach.io or use [www.foxreach.io/contact](https://www.foxreach.io/contact). Documentation: [www.foxreach.io/docs](https://www.foxreach.io/docs).
 
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE).

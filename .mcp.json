@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "foxreach": {
+      "type": "http",
+      "url": "https://api.foxreach.io/mcp"
+    }
+  }
+}
